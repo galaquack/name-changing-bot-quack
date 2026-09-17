@@ -19,6 +19,8 @@ module.exports = {
 		const youreMatch3 = /\b(ur )(.+)/i;
 		const youreMatch4 = /\b(u r )(.+)/i;
 		const youreMatch5 = /\b(you are )(.+)/i;
+		const excludeMe = "!exclude";
+		const nvmMe = "!unexclude";
 
 		const excludeFilePath = 'exclude.txt';
 		const excludes = [];
@@ -88,7 +90,7 @@ module.exports = {
 					}
 
 					if (target && excludes.includes(target.user.username)) {
-						console.log(`BLOCKED - ${target.user.username} is in exclude.txt: ${message.content}`);
+						// console.log(`BLOCKED - ${target.user.username} is in exclude.txt: ${message.content}`);
 					}
 					else if (nick && target) {
 						await target.setNickname(nick)
@@ -122,6 +124,23 @@ module.exports = {
 									}
 								});
 						}
+					}
+				}
+				
+				if(message.content == excludeMe){ //Exclude User
+					try {
+						//check to see if person is already in list before we go on
+						//CODEHERE
+						
+						fs.appendFileSync(excludeFilePath, speakingOrder[0].user.username); 
+						fs.appendFileSync(excludeFilePath, '\n'); //ok look theres probably a better way to do this but idc lmao
+						excludes.push(speakingOrder[0].user.username); //add to array so we don't need to restart to apply changes :)
+						const channel = client.channels.cache.get(message.channelId); //get channel id...
+						
+						channel.send('You are now excluded!'); //...so that we can send confirmation
+						console.log(`Added ${message.author.username} to exclude list`)
+					} catch (err) {
+						console.error('Error appending to file:', err);
 					}
 				}
 				
